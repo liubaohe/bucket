@@ -11,6 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @create: 2020-05-09 16:47
  **/
 @SpringBootApplication
+@ComponentScan(basePackages = {"com.bucket.frm.common","com.bucket.frm.portal"})
 public class FrameworkPortalApplication {
     public static void main(String[] args){
         SpringApplication.run(FrameworkPortalApplication.class);
