@@ -1,0 +1,46 @@
+package com.bucket.frm.portal.components;
+
+import com.bucket.frm.common.api.CommonResult;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+
+/**
+ * HibernateValidator错误结果处理切面
+ * @program: bucket
+ * @description:
+ * @author: liu.baohe
+ * @create: 2020-05-11 17:14
+ **/
+@Aspect
+@Component
+@Order(2)
+public class BindingResultAspect {
+    @Pointcut("execution(public * com.bucket.frm.portal.controller.*.*(..))")
+    public void BindingResult() {
+    }
+
+    @Around("BindingResult()")
+    public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object[] args = joinPoint.getArgs();
+        for (Object arg : args) {
+            if (arg instanceof BindingResult) {
+                BindingResult result = (BindingResult) arg;
+                if (result.hasErrors()) {
+                    FieldError fieldError = result.getFieldError();
+                    if(fieldError!=null){
+                        return CommonResult.validateFailed(fieldError.getDefaultMessage());
+                    }else{
+                        return CommonResult.validateFailed();
+                    }
+                }
+            }
+        }
+        return joinPoint.proceed();
+    }
+}
